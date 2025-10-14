@@ -1,4 +1,4 @@
-package com.project;
+package cat.iesesteveterradas;
 
 import java.io.File;
 import java.sql.Connection;

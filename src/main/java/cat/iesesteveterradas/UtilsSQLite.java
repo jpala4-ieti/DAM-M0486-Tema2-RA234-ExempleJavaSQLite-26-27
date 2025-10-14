@@ -1,4 +1,4 @@
-package com.project;
+package cat.iesesteveterradas;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
