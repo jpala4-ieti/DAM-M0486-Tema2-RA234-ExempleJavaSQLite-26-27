@@ -23,6 +23,7 @@ Per executar el projecte a Linux/macOS cal
 Per executar sense usar script propi, directament amb maven:
 ```bash
 mvn exec:java "-Dexec.mainClass=cat.iesesteveterradas.Main"
+mvn exec:java "-Dexec.mainClass=cat.iesesteveterradas.MainTransaccions"
 ```
 
 Per executar, un cop generat l'artefacte .jar
@@ -37,7 +38,9 @@ Per executar, un cop generat l'artefacte .jar
 mvn test
 # Executar un test individual especificant package o només nom del test
 mvn test "-Dtest=cat.iesesteveterradas.MainTest"
+mvn test "-Dtest=cat.iesesteveterradas.utils.UtilsSQLiteTest"
 mvn test -Dtest=MainTest
+mvn test -Dtest=UtilsSQLiteTest
 # Executar múltiples tests específics (separats per comes)
 mvn test -Dtest="MainTest,..."
 # Tots els tests que comencin amb "Lectura"

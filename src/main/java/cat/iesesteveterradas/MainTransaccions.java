@@ -1,111 +1,141 @@
 package cat.iesesteveterradas;
 
+import cat.iesesteveterradas.utils.UtilsSQLite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Aquest exemple mostra com executar una transacció a SQLite amb Java,
+ * incloent un exemple de rollback forçat.
+ */
 public class MainTransaccions {
 
-    public static void main(String[] args) throws SQLException {
+    private static final Logger logger = LoggerFactory.getLogger(MainTransaccions.class);
+
+    public static void main(String[] args) {
         String basePath = System.getProperty("user.dir") + "/data/";
         String filePath = basePath + "database.db";
-        ResultSet rs = null;
-
-        // Si no hi ha l'arxiu creat, el crea i li posa dades
-        File fDatabase = new File(filePath);
-        if (!fDatabase.exists()) { initDatabase(filePath); }
-
-        // Connectar (crea la BBDD si no existeix)
-        Connection conn = UtilsSQLite.connect(filePath);
-
-        // Llistar les taules
-        ArrayList<String> taules = UtilsSQLite.listTables(conn);
-        System.out.println(taules);
-
-        // Demanar informació de la taula
-        rs = UtilsSQLite.querySelect(conn, "SELECT * FROM warehouses;");
-        ResultSetMetaData rsmd = rs.getMetaData();
-        System.out.println("Informació de la taula:");
-        for (int cnt = 1; cnt < rsmd.getColumnCount(); cnt = cnt + 1) { 
-            String label = rsmd.getColumnLabel(cnt);
-            String name = rsmd.getColumnName(cnt);
-            int type = rsmd.getColumnType(cnt);
-            System.out.println("    " + label + ", " + name + ", " + type);
-        }
-
-        // SELECT a la base de dades
-        rs = UtilsSQLite.querySelect(conn, "SELECT * FROM warehouses;");
-        System.out.println("Contingut de la taula:");
-        while (rs.next()) {
-            System.out.println("    " + rs.getInt("id") + ", " + rs.getString("name"));
-        }
 
         try {
-            // Iniciar la transacció
-            conn.setAutoCommit(false);
+            // Per a la demostració, reiniciem la base de dades a cada execució.
+            initDatabase(filePath);
 
-            // Actualitzar una fila
-            UtilsSQLite.queryUpdate(conn, "UPDATE warehouses SET name=\"MediaMarkt\" WHERE id=2;");
+            // IMPORTANT PER PRODUCCIÓ: Si no hi ha l'arxiu creat, el crea i li posa dades
+            /*
+            File fDatabase = new File(filePath);
+            if (!fDatabase.exists()) {
+                initDatabase(filePath);
+            }
+            */            
 
-            // Afegir transaccions addicionals
-            UtilsSQLite.queryUpdate(conn, "INSERT INTO warehouses (name) VALUES (\"Decathlon\");");
+            try (Connection conn = UtilsSQLite.connect(filePath)) {
 
-            UtilsSQLite.queryUpdate(conn, "UPDATE warehouses SET name=\"Zara\" WHERE id=1;");
+                // Mostra l'estat inicial de la taula
+                System.out.println("\nContingut de la taula abans de qualsevol transacció:");
+                printWarehouses(conn);
 
-            // Esborrar una fila
-            UtilsSQLite.queryUpdate(conn, "DELETE FROM warehouses WHERE id=3;");
+                // =================================================================
+                // 1. TRANSACCIÓ FALLIDA (PROVOCA ROLLBACK)
+                // =================================================================
+                logger.warn("Iniciant transacció dissenyada per FALLAR...");
+                try {
+                    conn.setAutoCommit(false);
+                    UtilsSQLite.queryUpdatePS(conn, "UPDATE warehouses SET name = ? WHERE id = ?", "Nom Temporal", 1);
+                    logger.error("Intentant inserir un valor invàlid (NULL) per provocar un error...");
+                    UtilsSQLite.queryUpdatePS(conn, "INSERT INTO warehouses (name) VALUES (?);", (Object) null);
+                    conn.commit();
+                } catch (SQLException e) {
+                    logger.error("S'ha produït l'error esperat. Fent rollback...", e.getMessage());
+                    if (conn != null) {
+                        try {
+                            conn.rollback();
+                            logger.info("Rollback realitzat correctament.");
+                        } catch (SQLException ex) {
+                            logger.error("Error crític en intentar fer rollback.", ex);
+                        }
+                    }
+                } finally {
+                    if (conn != null) {
+                        conn.setAutoCommit(true);
+                    }
+                }
 
-            // Fer commit de la transacció
-            conn.commit();
-            System.out.println("Transacció completada amb èxit.");
+                // Mostra l'estat de la taula DESPRÉS del rollback
+                System.out.println("\nContingut de la taula després del ROLLBACK:");
+                System.out.println("(hauria de ser igual que l'estat inicial)");
+                printWarehouses(conn);
+
+                // =================================================================
+                // 2. TRANSACCIÓ CORRECTA (PROVOCA COMMIT)
+                // =================================================================
+                logger.info("Iniciant transacció dissenyada per funcionar CORRECTAMENT...");
+                try {
+                    conn.setAutoCommit(false);
+
+                    // MODIFICACIÓ: En lloc de substituir el nom, l'actualitzem per afegir " Spain"
+                    // L'operador '||' és l'estàndard de SQL per concatenar strings.
+                    logger.info("Actualitzant magatzems per afegir la localització ' Spain'");
+                    UtilsSQLite.queryUpdatePS(conn, "UPDATE warehouses SET name = name || ? WHERE id = ?", " Spain", 1); // Amazon -> Amazon Spain
+                    UtilsSQLite.queryUpdatePS(conn, "UPDATE warehouses SET name = name || ? WHERE id = ?", " Spain", 2); // El Corte Inglés -> El Corte Inglés Spain
+                    
+                    // Aquestes operacions es mantenen igual
+                    UtilsSQLite.queryUpdatePS(conn, "INSERT INTO warehouses (name) VALUES (?);", "Decathlon");
+                    UtilsSQLite.queryUpdatePS(conn, "DELETE FROM warehouses WHERE id = ?", 3); // Esborra Mecalux
+                    
+                    conn.commit();
+                    logger.info("Transacció completada amb èxit (COMMIT).");
+
+                } catch (SQLException e) {
+                    logger.error("Error INESPERAT durant la transacció correcta, fent rollback.", e);
+                    if (conn != null) {
+                        conn.rollback();
+                    }
+                } finally {
+                    if (conn != null) {
+                        conn.setAutoCommit(true);
+                    }
+                }
+
+                // Mostra l'estat final de la taula
+                System.out.println("\nContingut final de la taula després del COMMIT:");
+                printWarehouses(conn);
+            }
 
         } catch (SQLException e) {
-            // Fer rollback en cas d'error
-            if (conn != null) {
-                try {
-                    System.out.println("Error durant la transacció, fent rollback.");
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } finally {
-            // Tornar a activar l'auto commit
-            if (conn != null) {
-                conn.setAutoCommit(true);
-            }
+            logger.error("S'ha produït un error de base de dades.", e);
         }
-
-        // SELECT a la base de dades després de la transacció
-        rs = UtilsSQLite.querySelect(conn, "SELECT * FROM warehouses;");
-        System.out.println("Contingut de la taula modificada:");
-        while (rs.next()) {
-            System.out.println("    " + rs.getInt("id") + ", " + rs.getString("name"));
-        }
-
-        // Desconnectar
-        UtilsSQLite.disconnect(conn);
     }
 
-    static void initDatabase(String filePath) {
-        Connection conn = UtilsSQLite.connect(filePath);
+    /**
+     * Mètode auxiliar per imprimir el contingut de la taula 'warehouses'.
+     */
+    static void printWarehouses(Connection conn) throws SQLException {
+        try (ResultSet rs = UtilsSQLite.querySelect(conn, "SELECT * FROM warehouses ORDER BY id;")) {
+            while (rs.next()) {
+                System.out.println("    " + rs.getInt("id") + ", " + rs.getString("name"));
+            }
+        }
+    }
 
-        // Esborrar la taula (per si existeix)
-        UtilsSQLite.queryUpdate(conn, "DROP TABLE IF EXISTS warehouses;");
-
-        // Crear una nova taula
-        UtilsSQLite.queryUpdate(conn, "CREATE TABLE IF NOT EXISTS warehouses ("
-                                    + " id integer PRIMARY KEY AUTOINCREMENT,"
-                                    + " name text NOT NULL);");
-
-        // Afegir elements a una taula
-        UtilsSQLite.queryUpdate(conn, "INSERT INTO warehouses (name) VALUES (\"Amazon\");");
-        UtilsSQLite.queryUpdate(conn, "INSERT INTO warehouses (name) VALUES (\"El Corte Inglés\");");
-        UtilsSQLite.queryUpdate(conn, "INSERT INTO warehouses (name) VALUES (\"Mecalux\");");
-
-        UtilsSQLite.disconnect(conn);
+    /**
+     * Inicialitza la base de dades.
+     */
+    static void initDatabase(String filePath) throws SQLException {
+        try (Connection conn = UtilsSQLite.connect(filePath)) {
+            UtilsSQLite.queryUpdate(conn, "DROP TABLE IF EXISTS warehouses;");
+            UtilsSQLite.queryUpdate(conn, "CREATE TABLE warehouses (id integer PRIMARY KEY, name text NOT NULL);");
+            
+            logger.info("Inserint dades inicials...");
+            UtilsSQLite.queryUpdatePS(conn, "INSERT INTO warehouses (name) VALUES (?);", "Amazon");
+            UtilsSQLite.queryUpdatePS(conn, "INSERT INTO warehouses (name) VALUES (?);", "El Corte Inglés");
+            UtilsSQLite.queryUpdatePS(conn, "INSERT INTO warehouses (name) VALUES (?);", "Mecalux");
+            logger.info("Dades inicials inserides correctament.");
+        }
     }
 }

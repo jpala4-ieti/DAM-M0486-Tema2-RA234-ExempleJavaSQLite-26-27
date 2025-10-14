@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="1.082" tests="10" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="Z:\0.-to_delete_ieti_25_26\mp0486\repos_docent\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-25-26\target\test-classes;Z:\0.-to_delete_ieti_25_26\mp0486\repos_docent\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-25-26\target\classes;C:\Users\shinj\.m2\repository\org\slf4j\slf4j-api\2.0.13\slf4j-api-2.0.13.jar;C:\Users\shinj\.m2\repository\ch\qos\logback\logback-classic\1.5.6\logback-classic-1.5.6.jar;C:\Users\shinj\.m2\repository\ch\qos\logback\logback-core\1.5.6\logback-core-1.5.6.jar;C:\Users\shinj\.m2\repository\org\xerial\sqlite-jdbc\3.46.1.3\sqlite-jdbc-3.46.1.3.jar;C:\Users\shinj\.m2\repository\org\json\json\20240303\json-20240303.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\shinj\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\shinj\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\shinj\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\shinj\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\shinj\.m2\repository\org\assertj\assertj-core\3.26.3\assertj-core-3.26.3.jar;C:\Users\shinj\.m2\repository\net\bytebuddy\byte-buddy\1.14.18\byte-buddy-1.14.18.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Europe/Madrid"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="ES"/>
+    <property name="sun.boot.library.path" value="C:\toolkits.win\JavaDevelopment\EclipseTemurin\jdk-21.0.7+6\bin"/>
+    <property name="sun.java.command" value="Z:\WindowsTemp\surefire13362027685819221181\surefirebooter-20251014103731152_3.jar Z:\WindowsTemp\surefire13362027685819221181 2025-10-14T10-37-30_334-jvmRun1 surefire-20251014103731152_1tmp surefire_0-20251014103731152_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="Z:\0.-to_delete_ieti_25_26\mp0486\repos_docent\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-25-26\target\test-classes;Z:\0.-to_delete_ieti_25_26\mp0486\repos_docent\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-25-26\target\classes;C:\Users\shinj\.m2\repository\org\slf4j\slf4j-api\2.0.13\slf4j-api-2.0.13.jar;C:\Users\shinj\.m2\repository\ch\qos\logback\logback-classic\1.5.6\logback-classic-1.5.6.jar;C:\Users\shinj\.m2\repository\ch\qos\logback\logback-core\1.5.6\logback-core-1.5.6.jar;C:\Users\shinj\.m2\repository\org\xerial\sqlite-jdbc\3.46.1.3\sqlite-jdbc-3.46.1.3.jar;C:\Users\shinj\.m2\repository\org\json\json\20240303\json-20240303.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\shinj\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\shinj\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\shinj\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\shinj\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\shinj\.m2\repository\org\assertj\assertj-core\3.26.3\assertj-core-3.26.3.jar;C:\Users\shinj\.m2\repository\net\bytebuddy\byte-buddy\1.14.18\byte-buddy-1.14.18.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\shinj"/>
+    <property name="user.language" value="es"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-04-15"/>
+    <property name="java.home" value="C:\toolkits.win\JavaDevelopment\EclipseTemurin\jdk-21.0.7+6"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="Z:\0.-to_delete_ieti_25_26\mp0486\repos_docent\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-25-26"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="Z:\WindowsTemp\surefire13362027685819221181\surefirebooter-20251014103731152_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.7+6-LTS"/>
+    <property name="user.name" value="shinj"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-21.0.7+6"/>
+    <property name="localRepository" value="C:\Users\shinj\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="Z:\WindowsTemp\"/>
+    <property name="java.version" value="21.0.7"/>
+    <property name="user.dir" value="Z:\0.-to_delete_ieti_25_26\mp0486\repos_docent\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-25-26"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\toolkits.win\JavaDevelopment\EclipseTemurin\jdk-21.0.7+6\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\PowerShell\7;C:\Python313\Scripts\;C:\Python313\;C:\Program Files\Microsoft MPI\Bin\;C:\Program Files\Oculus\Support\oculus-runtime;c:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64_win\compiler;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\WINDOWS\system32;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\dotnet\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2023.3.0\;C:\Program Files\Calibre2\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\ProgramData\chocolatey\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\WireGuard\;G:\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\nodejs\;C:\Program Files\PowerShell\7\;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Users\shinj\.cargo\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin;C:\toolkits.win\JavaDevelopment\EclipseTemurin\jdk-21.0.7+6\bin;C:\toolkits.win\JavaDevelopment\apache-maven-3.9.4\bin;C:\toolkits.win\JavaDevelopment\gradle-8.7\bin;C:\toolkits.win\geckodriver;C:\toolkits.win\chocoportable\bin;C:\toolkits.win\SysinternalsSuite;C:\toolkits.win\Anaconda3\condabin;C:\toolkits.win\VSCode-win32-x64-1.49.3;C:\toolkits.win\Anaconda3\envs\jarvis\Library\bin\graphviz;C:\Users\shinj\AppData\Local\Microsoft\WindowsApps;C:\Users\shinj\AppData\Local\JetBrains\Toolbox\scripts;C:\Users\shinj\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\shinj\AppData\Local\Programs\MiKTeX\miktex\bin\x64\;C:\Users\shinj\AppData\Local\Microsoft\WindowsApps;C:\Users\shinj\AppData\Local\Programs\Ollama;C:\toolkits.win\utilities-generic\ffmpeg-7.0.2-full_build\bin;C:\Users\shinj\.dotnet\tools;C:\Users\shinj\AppData\Roaming\npm;C:\Users\shinj\.cache\lm-studio\bin;C:\Program Files (x86)\EaseUS\Todo Backup\bin\x64\;c:\Users\shinj\AppData\Roaming\Code\User\globalStorage\github.copilot-chat\debugCommand;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="21.0.7+6-LTS"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="queryUpdate_shouldInsertOneRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.873">
+    <system-out><![CDATA[10:37:33.593 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit3746257486862131066\test.db
+10:37:33.601 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.617 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdate. Files afectades: 1. SQL: INSERT INTO users(name, email) VALUES('Bob', 'bob@builder.com')
+10:37:33.677 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="queryUpdatePS_shouldDeleteRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.025">
+    <system-out><![CDATA[10:37:33.699 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit9456762075330312989\test.db
+10:37:33.699 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.713 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdatePS. Files afectades: 1. SQL: INSERT INTO users(name, email) VALUES(?, ?)
+10:37:33.716 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdatePS. Files afectades: 1. SQL: DELETE FROM users WHERE name = ?
+10:37:33.716 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executant querySelectPS. SQL: SELECT COUNT(*) FROM users
+10:37:33.719 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="queryUpdatePS_shouldInsertOneRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.016">
+    <system-out><![CDATA[10:37:33.725 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit16812530762788026313\test.db
+10:37:33.725 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.737 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdatePS. Files afectades: 1. SQL: INSERT INTO users(name, email) VALUES(?, ?)
+10:37:33.737 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executant querySelectPS. SQL: SELECT COUNT(*) FROM users WHERE name = ?
+10:37:33.737 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="disconnect_withNullConnection_shouldNotThrowException" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.012">
+    <system-out><![CDATA[10:37:33.743 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit7790370627536461507\test.db
+10:37:33.743 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.751 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="listTables_shouldReturnUsersTable" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.022">
+    <system-out><![CDATA[10:37:33.756 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit3229128641337621172\test.db
+10:37:33.756 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.764 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- S'han trobat 2 taules.
+10:37:33.774 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="queryUpdatePS_shouldUpdateExistingRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.021">
+    <system-out><![CDATA[10:37:33.780 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit7942927270910875615\test.db
+10:37:33.780 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.788 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdatePS. Files afectades: 1. SQL: INSERT INTO users(name, email) VALUES(?, ?)
+10:37:33.792 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdatePS. Files afectades: 1. SQL: UPDATE users SET email = ? WHERE name = ?
+10:37:33.792 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executant querySelectPS. SQL: SELECT email FROM users WHERE name = ?
+10:37:33.797 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="querySelect_shouldRetrieveData" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.015">
+    <system-out><![CDATA[10:37:33.804 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit15660907432178452455\test.db
+10:37:33.804 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.813 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdate. Files afectades: 1. SQL: INSERT INTO users(name, email) VALUES('Charlie', 'charlie@factory.com')
+10:37:33.813 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executant querySelect. SQL: SELECT * FROM users WHERE name = 'Charlie'
+10:37:33.814 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="querySelectPS_shouldRetrieveCorrectData" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.013">
+    <system-out><![CDATA[10:37:33.819 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit5042272018234408262\test.db
+10:37:33.819 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.828 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executada queryUpdatePS. Files afectades: 1. SQL: INSERT INTO users(name, email) VALUES(?, ?)
+10:37:33.828 [main] DEBUG cat.iesesteveterradas.utils.UtilsSQLite -- Executant querySelectPS. SQL: SELECT * FROM users WHERE name = ?
+10:37:33.829 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="connect_shouldReturnOpenConnection" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.009">
+    <system-out><![CDATA[10:37:33.834 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit16958350180168914869\test.db
+10:37:33.835 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.840 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+  <testcase name="queryUpdatePS_withInvalidSQL_shouldThrowSQLException" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.013">
+    <system-out><![CDATA[10:37:33.845 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD SQLite connectada a Z:\WindowsTemp\junit5098667976417698193\test.db
+10:37:33.845 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- BBDD driver: SQLite JDBC
+10:37:33.854 [main] INFO cat.iesesteveterradas.utils.UtilsSQLite -- DDBB SQLite desconnectada
+]]></system-out>
+  </testcase>
+</testsuite>
