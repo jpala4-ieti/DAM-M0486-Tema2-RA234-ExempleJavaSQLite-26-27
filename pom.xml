@@ -1,21 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 1. Coordenades del projecte -->
+    <!-- ============================================================ -->
+    <!-- 1. Coordenades i metadades del projecte                       -->
+    <!-- ============================================================ -->
     <groupId>cat.iesesteveterradas</groupId>
     <artifactId>ams2-mp0486-ra2-sqlite</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <!-- 2. Metadades descriptives -->
     <name>AMS2 MP0486 RA2 - Exemple Java SQLite</name>
     <description>Exemple d'accés a SQLite amb JDBC: consultes, PreparedStatement, transaccions i logging.</description>
     <url>https://www.iesesteveterradas.cat/</url>
 
-    <!-- 3. Propietats -->
+    <!-- ============================================================ -->
+    <!-- 2. Propietats: Java, classe principal i versions              -->
+    <!-- ============================================================ -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>21</maven.compiler.release>
 
         <!-- Classe que executa 'mvn exec:java' si no se n'indica cap altra amb -Dexec.mainClass=... -->
@@ -28,14 +33,36 @@
         <junit.version>5.10.3</junit.version>
         <assertj.version>3.26.3</assertj.version>
 
-        <!-- Versions dels plugins -->
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.3.1</maven-surefire-plugin.version>
+        <!-- Versions dels plugins (fixades perquè el build sigui igual a tots els ordinadors) -->
+        <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+        <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.5.1</maven-shade-plugin.version>
         <exec-maven-plugin.version>3.2.0</exec-maven-plugin.version>
     </properties>
 
-    <!-- 4. Dependències -->
+    <!-- ============================================================ -->
+    <!-- 3. Gestió de versions: tots els mòduls de JUnit alineats      -->
+    <!-- ============================================================ -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ============================================================ -->
+    <!-- 4. Dependències                                               -->
+    <!-- ============================================================ -->
     <dependencies>
         <!-- Base de dades: driver JDBC d'SQLite -->
         <dependency>
@@ -44,7 +71,7 @@
             <version>${sqlite.version}</version>
         </dependency>
 
-        <!-- Logging: SLF4J (API) + Logback (implementació) -->
+        <!-- Logging: SLF4J (API) + Logback (implementació). Configuració a src/main/resources/logback.xml -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -56,13 +83,19 @@
             <version>${logback.version}</version>
         </dependency>
 
-        <!-- Testing: JUnit 5 + AssertJ -->
+        <!-- Testing: JUnit 5 (versió definida pel BOM) -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Llançador de JUnit amb la mateixa versió: evita errors en executar els tests des de l'IDE -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Assercions més llegibles als tests: assertThat(...) -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -71,38 +104,75 @@
         </dependency>
     </dependencies>
 
-    <!-- 5. Configuració de la construcció (build) -->
+    <!-- ============================================================ -->
+    <!-- 5. Construcció (build)                                        -->
+    <!-- ============================================================ -->
     <build>
+        <!-- Versions de tots els plugins que fa servir el projecte -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven-install-plugin.version}</version>
+                </plugin>
+                <plugin> <!-- mvn dependency:copy-dependencies (vegeu el README) -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven-dependency-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${maven-shade-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${exec-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
-            <!-- Compilació: la versió de Java la pren de maven.compiler.release -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-            </plugin>
-
-            <!-- Tests: cal una versió 3.x perquè detecti els tests de JUnit 5 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-            </plugin>
-
-            <!-- Execució amb 'mvn exec:java' (fan servir els scripts run.sh i run.ps1) -->
+            <!-- Execució amb 'mvn exec:java' (la fan servir els scripts run.sh i run.ps1) -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
             </plugin>
 
-            <!-- Empaquetat: genera un .jar executable que inclou totes les dependències -->
+            <!-- Empaquetat: 'mvn package' genera un .jar executable amb totes les dependències -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -126,7 +196,7 @@
                                 <!-- Fusiona els META-INF/services (driver JDBC, proveïdor de SLF4J...) -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>cat.iesesteveterradas.Main</mainClass>
+                                    <mainClass>${exec.mainClass}</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
