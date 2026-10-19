@@ -1,3 +1,7 @@
+<!--
+    Configuració alternativa de Logback: consola + fitxer logs/app.log.
+    Per fer-la servir, copia aquest arxiu a src/main/resources/logback.xml
+-->
 <configuration>
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

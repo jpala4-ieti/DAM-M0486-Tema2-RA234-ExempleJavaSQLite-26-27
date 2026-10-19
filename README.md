@@ -1,60 +1,127 @@
-# Exemple de SQLite #
+# Exemple d'accés a SQLite amb Java (JDBC) · DAM MP0486 (curs 2026-2027)
 
-Aquest projecte conté un exemple d'ús d'SQLite amb java.
+Projecte d'exemple del **Tema 2 (RA2)** del mòdul **MP0486 Accés a dades**. Mostra:
 
-### Compilació i funcionament ###
+- Connexió a una base de dades SQLite amb JDBC i tancament de recursos amb *try-with-resources*.
+- Sentències DDL i DML amb `executeUpdate()` i consultes amb `executeQuery()`.
+- Metadades: `DatabaseMetaData` (llistar taules) i `ResultSetMetaData` (columnes d'un resultat).
+- `PreparedStatement` per evitar la injecció SQL.
+- Transaccions amb `setAutoCommit(false)`, `commit()` i `rollback()`.
+- Logging amb SLF4J + Logback per als missatges tècnics (i `System.out` per a la sortida de l'usuari).
+- Tests amb JUnit 5 i AssertJ sobre una base de dades temporal.
 
-Cal el 'Maven' per compilar el projecte
-```bash
-mvn clean
-mvn compile
+## Requisits
+
+- JDK 21
+- Maven 3.9 o superior
+- Git
+
+## Estructura
+
+```
+.
+├── pom.xml                         Dependències (sqlite-jdbc, SLF4J, Logback, JUnit, AssertJ) i plugins
+├── run.sh / run.ps1                Scripts de compilació i execució (Linux/macOS i Windows)
+├── data/                           Aquí es crea database.db en executar el programa
+├── doc/
+│   ├── logback-consola-fitxer.xml  Configuració alternativa del log: consola + fitxer logs/app.log
+│   └── Logging vs System.out.println.xlsx
+└── src/
+    ├── main/java/cat/iesesteveterradas/
+    │   ├── Main.java               Metadades, consultes, UPDATE/DELETE amb PreparedStatement
+    │   ├── MainTransaccions.java   Transacció que falla (rollback) i transacció correcta (commit)
+    │   ├── BaseDadesExemple.java   Creació de la taula 'warehouses' i visualització del contingut
+    │   └── utils/UtilsSQLite.java  Mètodes reutilitzables per connectar i executar SQL
+    ├── main/resources/logback.xml  Configuració del log (consola)
+    └── test/java/.../utils/UtilsSQLiteTest.java
 ```
 
-Per executar el projecte a Windows cal
+## Execució
+
+### Amb els scripts del projecte
+
+Compilen el projecte i executen la classe indicada (per defecte `cat.iesesteveterradas.Main`).
+
+**Linux / macOS**
+
 ```bash
-.\run.ps1 cat.iesesteveterradas.Main
+./run.sh
+./run.sh cat.iesesteveterradas.MainTransaccions
 ```
 
-Per executar el projecte a Linux/macOS cal
-```bash
-./run.sh cat.iesesteveterradas.Main
+Si dona un error de permisos: `chmod +x run.sh`
+
+**Windows (PowerShell)**
+
+```powershell
+.\run.ps1
+.\run.ps1 cat.iesesteveterradas.MainTransaccions
 ```
 
-Per executar sense usar script propi, directament amb maven:
+Si PowerShell no permet executar scripts: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+### Directament amb Maven
+
 ```bash
-mvn exec:java "-Dexec.mainClass=cat.iesesteveterradas.Main"
-mvn exec:java "-Dexec.mainClass=cat.iesesteveterradas.MainTransaccions"
+mvn clean compile
+mvn compile exec:java
+mvn compile exec:java "-Dexec.mainClass=cat.iesesteveterradas.MainTransaccions"
 ```
 
-Per executar, un cop generat l'artefacte .jar
+A PowerShell, les cometes de `-Dexec.mainClass=...` són obligatòries.
+
+### Directament amb java
+
+`mvn package` genera un .jar que ja inclou totes les dependències (driver d'SQLite i Logback):
+
 ```bash
-java -cp ./target/<nom de l'artefacte>.jar cat.iesesteveterradas.Main
+mvn clean package
+java -jar target/ams2-mp0486-ra2-sqlite-1.0.0.jar
+java -cp target/ams2-mp0486-ra2-sqlite-1.0.0.jar cat.iesesteveterradas.MainTransaccions
 ```
 
-### Execució de tests ###
-Per executar, un cop generat l'artefacte .jar
+> Per a la demostració, la base de dades es torna a crear a cada execució. A `Main.java`,
+> la constant `REINICIAR_BD = false` mostra el comportament d'una aplicació real:
+> només s'inicialitza la base de dades si l'arxiu encara no existeix.
+
+## Comprovar el contingut de la base de dades
+
+- **DBeaver** (https://dbeaver.io/): *Nova connexió → SQLite* i selecciona `data/database.db`.
+- **sqlite3** (línia d'ordres):
+
 ```bash
-# Executar TOTS els tests
-mvn test
-# Executar un test individual especificant package o només nom del test
-mvn test "-Dtest=cat.iesesteveterradas.MainTest"
-mvn test "-Dtest=cat.iesesteveterradas.utils.UtilsSQLiteTest"
-mvn test -Dtest=MainTest
-mvn test -Dtest=UtilsSQLiteTest
-# Executar múltiples tests específics (separats per comes)
-mvn test -Dtest="MainTest,..."
-# Tots els tests que comencin amb "Lectura"
-mvn test -Dtest="Lectura*"
-# Tots els tests que continguin "Arxiu"
-mvn test -Dtest="*Arxiu*"
-# Tests específics de List i Scanner
-mvn test -Dtest="*List*,*Scanner*"
+sqlite3 data/database.db ".tables"
+sqlite3 data/database.db "SELECT * FROM warehouses;"
 ```
 
-## Ajuda Visual Studio Code: resseteig de l'entorn de programació Java ##
+## Logging
 
-Si Visual Studio code no es comporta com esperem i hem provat a solucionar-ho sense èxit podem provar aquestes dues solucions:
+- La configuració és a `src/main/resources/logback.xml`.
+- Per veure l'SQL que executa `UtilsSQLite`, canvia el nivell de `root` a `debug`.
+- Per desar també el log a `logs/app.log`, copia `doc/logback-consola-fitxer.xml` a
+  `src/main/resources/logback.xml`.
 
-* Recarregar la Finestra: Obre la Paleta de Comandes (**Ctrl+Maj+P**), escriu Developer: "**Reload Window**" i prem Enter.
+## Tests
 
-* Netejar l'Espai de Treball: Si recarregar no funciona, obre de nou la Paleta de Comandes (**Ctrl+Maj+P**), escriu "**Java: Clean Java Language Server Workspace**" i prem Enter. Aquesta és una solució molt eficaç per a molts problemes relacionats amb Java a VS Code. Se't demanarà que recarreguis i tornis a escanejar el projecte.
+Cada test fa servir una base de dades nova en una carpeta temporal, de manera que no toca `data/database.db`.
+
+```bash
+mvn test                                                    # tots els tests
+mvn test -Dtest=UtilsSQLiteTest                             # una classe de test
+mvn test "-Dtest=cat.iesesteveterradas.utils.UtilsSQLiteTest"   # indicant també el paquet
+mvn test "-Dtest=UtilsSQLiteTest#transaction*"              # els mètodes que comencen per "transaction"
+mvn test "-Dtest=UtilsSQLiteTest#*Injection*"               # els tests sobre injecció SQL
+```
+
+## Ajuda Visual Studio Code: reinici de l'entorn Java
+
+Si Visual Studio Code no es comporta com esperem i no ho hem pogut solucionar, podem provar:
+
+* **Recarregar la finestra**: obre la paleta d'ordres (**Ctrl+Maj+P**), escriu **Developer: Reload Window** i prem Enter.
+* **Netejar l'espai de treball**: si recarregar no funciona, obre la paleta d'ordres (**Ctrl+Maj+P**),
+  escriu **Java: Clean Java Language Server Workspace** i prem Enter. És una solució molt eficaç per a
+  molts problemes de Java a VS Code. Et demanarà que recarreguis la finestra i tornarà a analitzar el projecte.
+
+## Llicència
+
+GNU General Public License v3.0. Vegeu el fitxer [LICENSE](LICENSE).

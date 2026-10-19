@@ -4,64 +4,67 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir; // <-- 1. Importa TempDir
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File; // <-- 2. Importa File
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-// Importacions estàtiques per a assercions més netes
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Classe de test exhaustiu per a UtilsSQLite.
- * Fa servir una base de dades en un fitxer temporal per a cada execució.
+ * Tests de UtilsSQLite.
+ * Cada test treballa amb una base de dades nova dins d'una carpeta temporal,
+ * de manera que els tests són independents entre ells i no toquen data/database.db.
  */
 class UtilsSQLiteTest {
 
-    // 3. JUnit injectarà aquí una carpeta temporal única per a la classe de test.
+    // JUnit crea una carpeta temporal nova per a cada test i l'esborra en acabar
     @TempDir
     File tempDir;
 
     private Connection conn;
-    
+
     /**
-     * S'executa abans de CADA mètode de test.
-     * Estableix la connexió i crea una taula de proves.
+     * S'executa abans de CADA test: obre la connexió i crea una taula de proves.
      */
     @BeforeEach
     void setUp() throws SQLException {
-        // 4. Construïm la ruta a un fitxer de BBDD dins de la carpeta temporal.
         String dbPath = new File(tempDir, "test.db").getAbsolutePath();
-        
-        // La connexió ara apunta a un fitxer real però temporal.
         conn = UtilsSQLite.connect(dbPath);
-        
-        // Creem una taula per a les proves
-        String createTableSQL = "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT);";
+
+        String createTableSQL = "CREATE TABLE users ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT)";
         try (Statement stmt = conn.createStatement()) {
             stmt.execute(createTableSQL);
         }
     }
 
     /**
-     * S'executa després de CADA mètode de test.
-     * Tanca la connexió.
+     * S'executa després de CADA test: tanca la connexió.
      */
     @AfterEach
     void tearDown() throws SQLException {
-        // El mètode tearDown ara hauria de funcionar perquè 'conn' no serà nul.
         if (conn != null && !conn.isClosed()) {
             UtilsSQLite.disconnect(conn);
         }
         assertThat(conn.isClosed()).isTrue();
     }
 
-    // ... ELS MÈTODES DE TEST (@Test) ES MANTENEN EXACTAMENT IGUAL ...
-    // ... No cal canviar-los, ja que treballen contra la variable 'conn' que ara és vàlida.
+    /** Compta les files de la taula 'users'. */
+    private int countUsers() throws SQLException {
+        try (ResultSet rs = UtilsSQLite.querySelect(conn, "SELECT COUNT(*) FROM users")) {
+            rs.next();
+            return rs.getInt(1);
+        }
+    }
+
+    // ----------------------------------------------------------------- connexió
 
     @Test
     @DisplayName("connect() hauria de retornar una connexió oberta")
@@ -76,12 +79,25 @@ class UtilsSQLiteTest {
         assertThatCode(() -> UtilsSQLite.disconnect(null)).doesNotThrowAnyException();
     }
 
+    // --------------------------------------------------------------- metadades
+
     @Test
     @DisplayName("listTables() hauria de retornar la taula 'users'")
     void listTables_shouldReturnUsersTable() throws SQLException {
         List<String> tables = UtilsSQLite.listTables(conn);
         assertThat(tables).isNotNull().contains("users");
     }
+
+    @Test
+    @DisplayName("listTables() no hauria de retornar les taules internes d'SQLite")
+    void listTables_shouldNotReturnInternalTables() throws SQLException {
+        // AUTOINCREMENT fa que SQLite creï la taula interna sqlite_sequence
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Anna");
+        List<String> tables = UtilsSQLite.listTables(conn);
+        assertThat(tables).containsExactly("users");
+    }
+
+    // ------------------------------------------------- PreparedStatement (segur)
 
     @Test
     @DisplayName("queryUpdatePS() hauria d'inserir una fila correctament")
@@ -107,17 +123,14 @@ class UtilsSQLiteTest {
             assertThat(rs.getString("email")).isEqualTo(newEmail);
         }
     }
-    
+
     @Test
     @DisplayName("queryUpdatePS() hauria d'esborrar una fila")
     void queryUpdatePS_shouldDeleteRow() throws SQLException {
         UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name, email) VALUES(?, ?)", "UserToDelete", "delete@me.com");
         int affectedRows = UtilsSQLite.queryUpdatePS(conn, "DELETE FROM users WHERE name = ?", "UserToDelete");
         assertThat(affectedRows).isEqualTo(1);
-        try (ResultSet rs = UtilsSQLite.querySelectPS(conn, "SELECT COUNT(*) FROM users")) {
-            rs.next();
-            assertThat(rs.getInt(1)).isZero();
-        }
+        assertThat(countUsers()).isZero();
     }
 
     @Test
@@ -133,15 +146,86 @@ class UtilsSQLiteTest {
     }
 
     @Test
+    @DisplayName("querySelectPS() hauria de tancar el statement en tancar el ResultSet")
+    void querySelectPS_shouldCloseStatementWhenResultSetIsClosed() throws SQLException {
+        ResultSet rs = UtilsSQLite.querySelectPS(conn, "SELECT * FROM users WHERE name = ?", "Ningú");
+        Statement stmt = rs.getStatement();
+        rs.close();
+        assertThat(stmt.isClosed()).isTrue();
+    }
+
+    @Test
     @DisplayName("queryUpdatePS() amb SQL invàlid hauria de llançar SQLException")
     void queryUpdatePS_withInvalidSQL_shouldThrowSQLException() {
         String invalidSql = "INSERTT INTO users(name) VALUES(?)";
         assertThatThrownBy(() -> UtilsSQLite.queryUpdatePS(conn, invalidSql, "Test"))
-            .isInstanceOf(SQLException.class);
+                .isInstanceOf(SQLException.class);
     }
-    
+
+    // ------------------------------------------------------------ injecció SQL
+
     @Test
-    @DisplayName("queryUpdate() hauria d'inserir una fila (ús no recomanat)")
+    @DisplayName("Statement amb SQL concatenat ÉS vulnerable a la injecció SQL")
+    void querySelect_withConcatenatedInput_isVulnerableToSqlInjection() throws SQLException {
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Alice");
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Bob");
+
+        String entradaMaliciosa = "' OR '1'='1";
+        String sql = "SELECT * FROM users WHERE name = '" + entradaMaliciosa + "'";
+
+        int files = 0;
+        try (ResultSet rs = UtilsSQLite.querySelect(conn, sql)) {
+            while (rs.next()) {
+                files++;
+            }
+        }
+        // La condició WHERE sempre és certa: es retornen TOTS els usuaris
+        assertThat(files).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("PreparedStatement NO és vulnerable a la injecció SQL")
+    void querySelectPS_withMaliciousInput_shouldPreventSqlInjection() throws SQLException {
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Alice");
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Bob");
+
+        String entradaMaliciosa = "' OR '1'='1";
+        try (ResultSet rs = UtilsSQLite.querySelectPS(conn, "SELECT * FROM users WHERE name = ?", entradaMaliciosa)) {
+            // El valor es tracta com un text literal: cap usuari es diu així
+            assertThat(rs.next()).isFalse();
+        }
+    }
+
+    // ------------------------------------------------------------- transaccions
+
+    @Test
+    @DisplayName("rollback() hauria de desfer tots els canvis de la transacció")
+    void transaction_rollback_shouldUndoAllChanges() throws SQLException {
+        conn.setAutoCommit(false);
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Temporal 1");
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Temporal 2");
+        conn.rollback();
+        conn.setAutoCommit(true);
+
+        assertThat(countUsers()).isZero();
+    }
+
+    @Test
+    @DisplayName("commit() hauria de confirmar tots els canvis de la transacció")
+    void transaction_commit_shouldKeepAllChanges() throws SQLException {
+        conn.setAutoCommit(false);
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Definitiu 1");
+        UtilsSQLite.queryUpdatePS(conn, "INSERT INTO users(name) VALUES(?)", "Definitiu 2");
+        conn.commit();
+        conn.setAutoCommit(true);
+
+        assertThat(countUsers()).isEqualTo(2);
+    }
+
+    // ------------------------------------------- Statement (ús no recomanat)
+
+    @Test
+    @DisplayName("queryUpdate() hauria d'inserir una fila (ús no recomanat amb dades d'usuari)")
     void queryUpdate_shouldInsertOneRow() throws SQLException {
         String sql = "INSERT INTO users(name, email) VALUES('Bob', 'bob@builder.com')";
         int affectedRows = UtilsSQLite.queryUpdate(conn, sql);
@@ -149,7 +233,15 @@ class UtilsSQLiteTest {
     }
 
     @Test
-    @DisplayName("querySelect() hauria de recuperar dades (ús no recomanat)")
+    @DisplayName("queryUpdate() amb DDL hauria de retornar 0 files afectades")
+    void queryUpdate_withDDL_shouldReturnZero() throws SQLException {
+        int affectedRows = UtilsSQLite.queryUpdate(conn, "CREATE TABLE logs (id INTEGER PRIMARY KEY, msg TEXT)");
+        assertThat(affectedRows).isZero();
+        assertThat(UtilsSQLite.listTables(conn)).contains("logs");
+    }
+
+    @Test
+    @DisplayName("querySelect() hauria de recuperar dades (ús no recomanat amb dades d'usuari)")
     void querySelect_shouldRetrieveData() throws SQLException {
         UtilsSQLite.queryUpdate(conn, "INSERT INTO users(name, email) VALUES('Charlie', 'charlie@factory.com')");
         try (ResultSet rs = UtilsSQLite.querySelect(conn, "SELECT * FROM users WHERE name = 'Charlie'")) {
