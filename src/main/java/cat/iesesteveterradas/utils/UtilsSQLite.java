@@ -184,8 +184,16 @@ public final class UtilsSQLite {
 
     /**
      * Assigna els paràmetres a un PreparedStatement (els índexs JDBC comencen per 1).
+     *
+     * Abans comprova que n'hi hagi tants com marcadors '?': el driver d'SQLite
+     * deixa com a NULL els que falten (sense cap error) i, si en sobren, llança
+     * una ArrayIndexOutOfBoundsException en lloc d'una SQLException.
      */
     private static void setParams(PreparedStatement pstmt, Object... params) throws SQLException {
+        int esperats = pstmt.getParameterMetaData().getParameterCount();
+        if (params.length != esperats) {
+            throw new SQLException("La sentència té " + esperats + " paràmetres '?', però se n'han rebut " + params.length);
+        }
         for (int i = 0; i < params.length; i++) {
             pstmt.setObject(i + 1, params[i]);
         }

@@ -103,14 +103,27 @@ sqlite3 data/database.db "SELECT * FROM warehouses;"
 
 ## Tests
 
-Cada test fa servir una base de dades nova en una carpeta temporal, de manera que no toca `data/database.db`.
+La suite té 67 tests (JUnit 5 + AssertJ). Cada test treballa amb una base de dades nova
+dins d'una carpeta temporal, de manera que els tests són independents i no toquen `data/database.db`.
+
+| Classe de test | Què comprova |
+|---|---|
+| `utils/UtilsSQLiteTest` | Connexió, metadades (`listTables`), `Statement` i `PreparedStatement`, paràmetres (tipus, `NULL`, nombre incorrecte), textos amb accents i apòstrofs, injecció SQL (casos vulnerables i casos segurs) i transaccions (commit, rollback, atomicitat i aïllament) |
+| `BaseDadesExempleTest` | Ruta de la base de dades, creació de la taula i les dades inicials, creació de la carpeta, reinicialització i sortida de `mostrarContingut()` |
+| `MainTransaccionsTest` | Transacció que falla (rollback), transacció correcta (commit), restauració de l'autocommit i missatges de log |
+| `MainTest` | Execució completa de `Main` en una carpeta temporal: sortida per pantalla i estat final de la base de dades |
+
+Les classes de `suport/` ajuden a fer els tests: `SortidaConsola` captura `System.out`,
+`DirectoriTreball` fa que `Main` treballi en una carpeta temporal i `LogCapturat` permet
+comprovar els missatges de log.
 
 ```bash
 mvn test                                                    # tots els tests
 mvn test -Dtest=UtilsSQLiteTest                             # una classe de test
-mvn test "-Dtest=cat.iesesteveterradas.utils.UtilsSQLiteTest"   # indicant també el paquet
-mvn test "-Dtest=UtilsSQLiteTest#transaction*"              # els mètodes que comencen per "transaction"
-mvn test "-Dtest=UtilsSQLiteTest#*Injection*"               # els tests sobre injecció SQL
+mvn test "-Dtest=UtilsSQLiteTest$InjeccioSQL"               # un grup (@Nested) d'una classe
+mvn test "-Dtest=MainTransaccionsTest#transaccioQueFalla*"  # els mètodes que comencen per...
+mvn test -DexcludedGroups=integracio                        # sense els tests d'integració (més ràpid)
+mvn test -Dgroups=integracio                                # només els tests d'integració (Main i MainTransaccions.main)
 ```
 
 ## Ajuda Visual Studio Code: reinici de l'entorn Java

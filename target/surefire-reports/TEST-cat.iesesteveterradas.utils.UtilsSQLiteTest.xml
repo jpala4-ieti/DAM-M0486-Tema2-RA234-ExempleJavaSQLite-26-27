@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.985" tests="17" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.532" tests="0" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="ES"/>
     <property name="sun.boot.library.path" value="C:\toolkits.win\JavaDevelopment\jvms\amazon-corretto-21.0.9.10.1-windows-x64-jdk\jdk21.0.9_10\bin"/>
-    <property name="sun.java.command" value="Z:\WindowsTemp\surefire14210742938510771955\surefirebooter-20261019231216640_3.jar Z:\WindowsTemp\surefire14210742938510771955 2026-10-19T23-12-16_300-jvmRun1 surefire-20261019231216640_1tmp surefire_0-20261019231216640_2tmp"/>
+    <property name="sun.java.command" value="Z:\WindowsTemp\surefire11161659345441610752\surefirebooter-20261020054946542_3.jar Z:\WindowsTemp\surefire11161659345441610752 2026-10-20T05-49-46_055-jvmRun1 surefire-20261020054946542_1tmp surefire_0-20261020054946542_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="Z:\_docent_curs_26_27\AMS2-M0486\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-26-27\target\test-classes;Z:\_docent_curs_26_27\AMS2-M0486\DAM-M0486-Tema2-RA234-ExempleJavaSQLite-26-27\target\classes;C:\Users\shinj\.m2\repository\org\xerial\sqlite-jdbc\3.53.4.0\sqlite-jdbc-3.53.4.0.jar;C:\Users\shinj\.m2\repository\org\slf4j\slf4j-api\2.0.17\slf4j-api-2.0.17.jar;C:\Users\shinj\.m2\repository\ch\qos\logback\logback-classic\1.5.38\logback-classic-1.5.38.jar;C:\Users\shinj\.m2\repository\ch\qos\logback\logback-core\1.5.38\logback-core-1.5.38.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\shinj\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\shinj\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\shinj\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\shinj\.m2\repository\org\junit\platform\junit-platform-launcher\1.10.3\junit-platform-launcher-1.10.3.jar;C:\Users\shinj\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\shinj\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\shinj\.m2\repository\org\assertj\assertj-core\3.26.3\assertj-core-3.26.3.jar;C:\Users\shinj\.m2\repository\net\bytebuddy\byte-buddy\1.14.18\byte-buddy-1.14.18.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -30,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="Z:\WindowsTemp\surefire14210742938510771955\surefirebooter-20261019231216640_3.jar"/>
+    <property name="surefire.real.class.path" value="Z:\WindowsTemp\surefire11161659345441610752\surefirebooter-20261020054946542_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.9+10-LTS"/>
@@ -59,106 +59,4 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="transaction_commit_shouldKeepAllChanges" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.783">
-    <system-out><![CDATA[2026-10-19 23:12:18.081 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit10485565988509058160\test.db
-2026-10-19 23:12:18.095 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.185 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="queryUpdate_shouldInsertOneRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.01">
-    <system-out><![CDATA[2026-10-19 23:12:18.197 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit5114926149941141806\test.db
-2026-10-19 23:12:18.197 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.204 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="querySelectPS_withMaliciousInput_shouldPreventSqlInjection" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.013">
-    <system-out><![CDATA[2026-10-19 23:12:18.208 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit1107238130950594493\test.db
-2026-10-19 23:12:18.208 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.218 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="queryUpdatePS_shouldDeleteRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.012">
-    <system-out><![CDATA[2026-10-19 23:12:18.222 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit16195579169516211868\test.db
-2026-10-19 23:12:18.222 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.231 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="queryUpdatePS_shouldInsertOneRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.009">
-    <system-out><![CDATA[2026-10-19 23:12:18.234 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit15923333271919708711\test.db
-2026-10-19 23:12:18.235 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.241 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="disconnect_withNullConnection_shouldNotThrowException" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.008">
-    <system-out><![CDATA[2026-10-19 23:12:18.245 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit2343644178500180079\test.db
-2026-10-19 23:12:18.245 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.250 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="listTables_shouldNotReturnInternalTables" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.017">
-    <system-out><![CDATA[2026-10-19 23:12:18.253 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit1841766606105496374\test.db
-2026-10-19 23:12:18.254 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.268 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="listTables_shouldReturnUsersTable" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.007">
-    <system-out><![CDATA[2026-10-19 23:12:18.271 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit5928335495212091245\test.db
-2026-10-19 23:12:18.271 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.276 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="queryUpdatePS_shouldUpdateExistingRow" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.014">
-    <system-out><![CDATA[2026-10-19 23:12:18.279 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit13058788854809551856\test.db
-2026-10-19 23:12:18.279 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.291 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="querySelect_shouldRetrieveData" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.01">
-    <system-out><![CDATA[2026-10-19 23:12:18.295 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit11354295367946805458\test.db
-2026-10-19 23:12:18.295 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.302 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="querySelectPS_shouldCloseStatementWhenResultSetIsClosed" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.007">
-    <system-out><![CDATA[2026-10-19 23:12:18.305 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit14273223700672375617\test.db
-2026-10-19 23:12:18.306 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.310 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="transaction_rollback_shouldUndoAllChanges" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.008">
-    <system-out><![CDATA[2026-10-19 23:12:18.313 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit17909201711683029265\test.db
-2026-10-19 23:12:18.313 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.318 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="queryUpdate_withDDL_shouldReturnZero" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.011">
-    <system-out><![CDATA[2026-10-19 23:12:18.321 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit13807331027786523028\test.db
-2026-10-19 23:12:18.321 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.329 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="querySelect_withConcatenatedInput_isVulnerableToSqlInjection" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.012">
-    <system-out><![CDATA[2026-10-19 23:12:18.332 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit14174226818060847980\test.db
-2026-10-19 23:12:18.332 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.341 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="querySelectPS_shouldRetrieveCorrectData" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.009">
-    <system-out><![CDATA[2026-10-19 23:12:18.344 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit14797269647253585279\test.db
-2026-10-19 23:12:18.344 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.351 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="connect_shouldReturnOpenConnection" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.006">
-    <system-out><![CDATA[2026-10-19 23:12:18.354 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit12265678249978838529\test.db
-2026-10-19 23:12:18.354 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.358 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
-  <testcase name="queryUpdatePS_withInvalidSQL_shouldThrowSQLException" classname="cat.iesesteveterradas.utils.UtilsSQLiteTest" time="0.008">
-    <system-out><![CDATA[2026-10-19 23:12:18.361 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite connectada a Z:\WindowsTemp\junit15306231712944486632\test.db
-2026-10-19 23:12:18.361 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD driver: SQLite JDBC 3.53.4.0
-2026-10-19 23:12:18.368 &amp#27;[35m[main]&amp#27;[0;39m &amp#27;[34mINFO &amp#27;[0;39m &amp#27;[36mc.i.u.UtilsSQLite&amp#27;[0;39m - BBDD SQLite desconnectada
-]]></system-out>
-  </testcase>
 </testsuite>
