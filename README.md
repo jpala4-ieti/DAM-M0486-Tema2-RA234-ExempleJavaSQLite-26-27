@@ -7,6 +7,7 @@ Projecte d'exemple del **Tema 2 (RA2)** del mòdul **MP0486 Accés a dades**. Mo
 - Metadades: `DatabaseMetaData` (llistar taules) i `ResultSetMetaData` (columnes d'un resultat).
 - `PreparedStatement` per evitar la injecció SQL.
 - Transaccions amb `setAutoCommit(false)`, `commit()` i `rollback()`.
+- Claus foranes activades a cada connexió (`PRAGMA foreign_keys = ON`).
 - Logging amb SLF4J + Logback per als missatges tècnics (i `System.out` per a la sortida de l'usuari).
 - Tests amb JUnit 5 i AssertJ sobre una base de dades temporal.
 
@@ -24,8 +25,7 @@ Projecte d'exemple del **Tema 2 (RA2)** del mòdul **MP0486 Accés a dades**. Mo
 ├── run.sh / run.ps1                Scripts de compilació i execució (Linux/macOS i Windows)
 ├── data/                           Aquí es crea database.db en executar el programa
 ├── doc/
-│   ├── logback-consola-fitxer.xml  Configuració alternativa del log: consola + fitxer logs/app.log
-│   └── Logging vs System.out.println.xlsx
+│   └── logback-consola-fitxer.xml  Configuració alternativa del log: consola + fitxer logs/app.log
 └── src/
     ├── main/java/cat/iesesteveterradas/
     │   ├── Main.java               Metadades, consultes, UPDATE/DELETE amb PreparedStatement
@@ -33,7 +33,7 @@ Projecte d'exemple del **Tema 2 (RA2)** del mòdul **MP0486 Accés a dades**. Mo
     │   ├── BaseDadesExemple.java   Creació de la taula 'warehouses' i visualització del contingut
     │   └── utils/UtilsSQLite.java  Mètodes reutilitzables per connectar i executar SQL
     ├── main/resources/logback.xml  Configuració del log (consola)
-    └── test/java/.../utils/UtilsSQLiteTest.java
+    └── test/java/cat/iesesteveterradas/   Tests (vegeu l'apartat «Tests»)
 ```
 
 ## Execució
@@ -50,6 +50,7 @@ Compilen el projecte i executen la classe indicada (per defecte `cat.iesestevete
 ```
 
 Si dona un error de permisos: `chmod +x run.sh`
+(i `git update-index --chmod=+x run.sh` perquè el permís quedi desat al repositori).
 
 **Windows (PowerShell)**
 
@@ -82,7 +83,21 @@ java -cp target/ams2-mp0486-ra2-sqlite-1.0.0.jar cat.iesesteveterradas.MainTrans
 
 > Per a la demostració, la base de dades es torna a crear a cada execució. A `Main.java`,
 > la constant `REINICIAR_BD = false` mostra el comportament d'una aplicació real:
-> només s'inicialitza la base de dades si l'arxiu encara no existeix.
+> només s'inicialitza la base de dades si encara no té la taula `warehouses`.
+
+Si el programa falla (o no compila), el procés acaba amb un codi de sortida diferent de 0,
+tant amb els scripts com amb `java -jar`.
+
+## Detalls d'SQLite i JDBC que convé conèixer
+
+- **Claus foranes.** SQLite porta la comprovació de claus foranes desactivada. `UtilsSQLite.connect()`
+  l'activa a cada connexió amb `PRAGMA foreign_keys = ON`; sense això, les restriccions `FOREIGN KEY`
+  de les taules no tenen cap efecte.
+- **`setAutoCommit(true)` confirma la transacció oberta.** Per això cal fer `rollback()` amb qualsevol
+  excepció (no només `SQLException`) abans de tornar a activar l'autocommit. `MainTransaccions` mostra
+  el patró pas a pas i `UtilsSQLite.executarEnTransaccio()` l'encapsula per reutilitzar-lo.
+- **El DDL és transaccional.** `BaseDadesExemple.inicialitzar()` crea la taula i les dades inicials dins
+  d'una transacció: si falla a mitges, la base de dades queda com estava.
 
 ## Comprovar el contingut de la base de dades
 
@@ -103,28 +118,31 @@ sqlite3 data/database.db "SELECT * FROM warehouses;"
 
 ## Tests
 
-La suite té 67 tests (JUnit 5 + AssertJ). Cada test treballa amb una base de dades nova
+La suite té 75 tests (JUnit 5 + AssertJ). Cada test treballa amb una base de dades nova
 dins d'una carpeta temporal, de manera que els tests són independents i no toquen `data/database.db`.
 
 | Classe de test | Què comprova |
 |---|---|
-| `utils/UtilsSQLiteTest` | Connexió, metadades (`listTables`), `Statement` i `PreparedStatement`, paràmetres (tipus, `NULL`, nombre incorrecte), textos amb accents i apòstrofs, injecció SQL (casos vulnerables i casos segurs) i transaccions (commit, rollback, atomicitat i aïllament) |
-| `BaseDadesExempleTest` | Ruta de la base de dades, creació de la taula i les dades inicials, creació de la carpeta, reinicialització i sortida de `mostrarContingut()` |
+| `utils/UtilsSQLiteTest` | Connexió, metadades (`listTables`), `Statement` i `PreparedStatement`, paràmetres (tipus, `NULL`, nombre incorrecte), textos amb accents i apòstrofs, claus foranes, injecció SQL (casos vulnerables i casos segurs) i transaccions (commit, rollback, atomicitat, aïllament i `executarEnTransaccio()`) |
+| `BaseDadesExempleTest` | Ruta de la base de dades, `estaInicialitzada()`, creació de la taula i les dades inicials, creació de la carpeta, reinicialització i sortida de `mostrarContingut()` |
 | `MainTransaccionsTest` | Transacció que falla (rollback), transacció correcta (commit), restauració de l'autocommit i missatges de log |
-| `MainTest` | Execució completa de `Main` en una carpeta temporal: sortida per pantalla i estat final de la base de dades |
+| `MainTest` | Execució completa de l'exemple de `Main` en una carpeta temporal: sortida per pantalla i estat final de la base de dades |
 
-Les classes de `suport/` ajuden a fer els tests: `SortidaConsola` captura `System.out`,
-`DirectoriTreball` fa que `Main` treballi en una carpeta temporal i `LogCapturat` permet
-comprovar els missatges de log.
+Les classes de `suport/` ajuden a fer els tests: `SortidaConsola` captura `System.out`
+i `LogCapturat` permet comprovar els missatges de log. `Main` i `MainTransaccions` tenen
+el mètode `executar(ruta)`, que els tests criden amb un arxiu dins d'una carpeta temporal.
 
 ```bash
 mvn test                                                    # tots els tests
 mvn test -Dtest=UtilsSQLiteTest                             # una classe de test
-mvn test "-Dtest=UtilsSQLiteTest$InjeccioSQL"               # un grup (@Nested) d'una classe
-mvn test "-Dtest=MainTransaccionsTest#transaccioQueFalla*"  # els mètodes que comencen per...
+mvn test '-Dtest=UtilsSQLiteTest$InjeccioSQL'               # un grup (@Nested) d'una classe
+mvn test '-Dtest=MainTransaccionsTest#transaccioQueFalla*'  # els mètodes que comencen per...
 mvn test -DexcludedGroups=integracio                        # sense els tests d'integració (més ràpid)
-mvn test -Dgroups=integracio                                # només els tests d'integració (Main i MainTransaccions.main)
+mvn test -Dgroups=integracio                                # només els tests d'integració (Main i MainTransaccions.executar)
 ```
+
+Les cometes han de ser **simples**: entre cometes dobles, tant bash com PowerShell interpreten
+`$InjeccioSQL` com una variable (buida) i s'executaria tota la classe `UtilsSQLiteTest`.
 
 ## Ajuda Visual Studio Code: reinici de l'entorn Java
 

@@ -1,8 +1,8 @@
 package cat.iesesteveterradas;
 
-import cat.iesesteveterradas.suport.DirectoriTreball;
 import cat.iesesteveterradas.suport.SortidaConsola;
 import cat.iesesteveterradas.utils.UtilsSQLite;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,8 @@ import static cat.iesesteveterradas.BaseDadesExempleTest.files;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Proves d'integració: executen Main.main() en una carpeta temporal i en comproven la sortida.
+ * Proves d'integració: executen tot l'exemple de Main sobre una base de dades
+ * dins d'una carpeta temporal i en comproven la sortida.
  */
 @Tag("integracio")
 @DisplayName("Main")
@@ -25,36 +26,32 @@ class MainTest {
     @TempDir
     Path tempDir;
 
-    @SuppressWarnings("try")
-    private String executarMain() {
-        try (DirectoriTreball dir = DirectoriTreball.canviarA(tempDir);
-             SortidaConsola sortida = SortidaConsola.capturar()) {
-            Main.main(new String[0]);
-            return sortida.text();
-        }
+    private Path arxiuBD;
+
+    @BeforeEach
+    void setUp() {
+        // La carpeta 'data' encara no existeix: l'ha de crear el programa
+        arxiuBD = tempDir.resolve("data").resolve("database.db");
     }
 
-    @SuppressWarnings("try")
-    private SortidaConsola executarMainCapturant() {
-        SortidaConsola sortida = SortidaConsola.capturar();
-        try (DirectoriTreball dir = DirectoriTreball.canviarA(tempDir)) {
-            Main.main(new String[0]);
-        } finally {
-            sortida.close();
+    /** Executa l'exemple i retorna tot el que ha escrit per pantalla. */
+    private SortidaConsola executarMain() throws SQLException {
+        try (SortidaConsola sortida = SortidaConsola.capturar()) {
+            Main.executar(arxiuBD.toString());
+            return sortida;
         }
-        return sortida;
     }
 
     @Test
     @DisplayName("Llista només la taula warehouses")
-    void llistaLesTaules() {
-        assertThat(executarMain()).contains("Taules existents: [warehouses]");
+    void llistaLesTaules() throws SQLException {
+        assertThat(executarMain().text()).contains("Taules existents: [warehouses]");
     }
 
     @Test
     @DisplayName("Mostra les columnes de la taula amb el seu tipus (ResultSetMetaData)")
-    void mostraLesColumnes() {
-        SortidaConsola sortida = executarMainCapturant();
+    void mostraLesColumnes() throws SQLException {
+        SortidaConsola sortida = executarMain();
         assertThat(sortida.seccio("Informació de la taula 'warehouses':")).containsExactly(
                 "Columna 1: id (Nom: id, Tipus: INTEGER)",
                 "Columna 2: name (Nom: name, Tipus: TEXT)");
@@ -62,29 +59,28 @@ class MainTest {
 
     @Test
     @DisplayName("Mostra el contingut inicial, el filtre amb LIKE i el contingut modificat")
-    void mostraElsResultats() {
-        SortidaConsola sortida = executarMainCapturant();
+    void mostraElsResultats() throws SQLException {
+        SortidaConsola sortida = executarMain();
         assertThat(sortida.seccio("Contingut inicial de la taula:")).containsExactly("1, Amazon", "2, El Corte Inglés", "3, Mecalux");
         assertThat(sortida.seccio("Magatzems que contenen 'Spain':")).containsExactly("2, El Corte Inglés Spain");
         assertThat(sortida.seccio("Contingut de la taula modificada:")).containsExactly("1, Amazon", "2, El Corte Inglés Spain");
     }
 
     @Test
-    @DisplayName("Crea data/database.db (i la carpeta data) amb l'estat final")
+    @DisplayName("Crea l'arxiu de la base de dades (i la carpeta que el conté) amb l'estat final")
     void creaLaBaseDeDades() throws SQLException {
         executarMain();
-        Path arxiu = tempDir.resolve("data").resolve("database.db");
-        assertThat(arxiu).exists();
-        try (Connection conn = UtilsSQLite.connect(arxiu.toString())) {
+        assertThat(arxiuBD).exists();
+        try (Connection conn = UtilsSQLite.connect(arxiuBD.toString())) {
             assertThat(files(conn)).containsExactly("1, Amazon", "2, El Corte Inglés Spain");
         }
     }
 
     @Test
     @DisplayName("Executar-lo dues vegades dona el mateix resultat (la BD es reinicia)")
-    void esRepetible() {
-        String primera = executarMain();
-        String segona = executarMain();
+    void esRepetible() throws SQLException {
+        String primera = executarMain().text();
+        String segona = executarMain().text();
         assertThat(segona).isEqualTo(primera);
     }
 }

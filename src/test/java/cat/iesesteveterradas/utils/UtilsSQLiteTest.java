@@ -106,6 +106,17 @@ class UtilsSQLiteTest {
         }
 
         @Test
+        @DisplayName("connect() activa la comprovació de claus foranes (SQLite la porta desactivada)")
+        void connect_activaLesClausForanes() throws SQLException {
+            UtilsSQLite.queryUpdate(conn, "CREATE TABLE posts ("
+                    + "id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id))");
+            // No existeix cap usuari amb id 999
+            assertThatThrownBy(() -> UtilsSQLite.queryUpdatePS(conn, "INSERT INTO posts(user_id) VALUES(?)", 999))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("FOREIGN KEY");
+        }
+
+        @Test
         @DisplayName("disconnect() tanca la connexió")
         void disconnect_tancaLaConnexio() throws SQLException {
             UtilsSQLite.disconnect(conn);
@@ -469,6 +480,59 @@ class UtilsSQLiteTest {
                 conn.setAutoCommit(true);
             }
             assertThat(noms(UtilsSQLite.querySelect(conn, "SELECT name FROM users"))).containsExactly("Existent");
+        }
+
+        @Test
+        @DisplayName("executarEnTransaccio() confirma totes les operacions i torna a activar l'autocommit")
+        void executarEnTransaccio_confirmaElsCanvis() throws SQLException {
+            UtilsSQLite.executarEnTransaccio(conn, c -> {
+                UtilsSQLite.queryUpdatePS(c, "INSERT INTO users(name) VALUES(?)", "Definitiu 1");
+                UtilsSQLite.queryUpdatePS(c, "INSERT INTO users(name) VALUES(?)", "Definitiu 2");
+            });
+            assertThat(conn.getAutoCommit()).isTrue();
+            assertThat(comptarUsuaris(conn)).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("executarEnTransaccio() amb un error SQL: desfà tots els canvis i llança l'excepció")
+        void executarEnTransaccio_errorSQL_desfaElsCanvis() throws SQLException {
+            inserir("Existent", null);
+            assertThatThrownBy(() -> UtilsSQLite.executarEnTransaccio(conn, c -> {
+                UtilsSQLite.queryUpdatePS(c, "UPDATE users SET name = ? WHERE name = ?", "Modificat", "Existent");
+                UtilsSQLite.queryUpdatePS(c, "INSERT INTO users(name) VALUES(?)", (Object) null); // viola NOT NULL
+            })).isInstanceOf(SQLException.class).hasMessageContaining("NOT NULL");
+
+            assertThat(conn.getAutoCommit()).isTrue();
+            assertThat(noms(UtilsSQLite.querySelect(conn, "SELECT name FROM users"))).containsExactly("Existent");
+        }
+
+        @Test
+        @DisplayName("executarEnTransaccio() amb una excepció que no és SQLException: també desfà els canvis")
+        void executarEnTransaccio_excepcioNoPrevista_desfaElsCanvis() throws SQLException {
+            inserir("Existent", null);
+            assertThatThrownBy(() -> UtilsSQLite.executarEnTransaccio(conn, c -> {
+                UtilsSQLite.queryUpdatePS(c, "UPDATE users SET name = ? WHERE name = ?", "Modificat", "Existent");
+                throw new IllegalStateException("Error no previst");
+            })).isInstanceOf(IllegalStateException.class);
+
+            // Sense el rollback, tornar a activar l'autocommit hauria confirmat l'UPDATE
+            assertThat(conn.getAutoCommit()).isTrue();
+            assertThat(noms(UtilsSQLite.querySelect(conn, "SELECT name FROM users"))).containsExactly("Existent");
+        }
+
+        @Test
+        @DisplayName("executarEnTransaccio() no admet una connexió que ja té una transacció en curs")
+        void executarEnTransaccio_ambTransaccioEnCurs_llancaSQLException() throws SQLException {
+            conn.setAutoCommit(false);
+            try {
+                assertThatThrownBy(() -> UtilsSQLite.executarEnTransaccio(conn, c -> inserir("Anna", null)))
+                        .isInstanceOf(SQLException.class)
+                        .hasMessageContaining("transacció en curs");
+            } finally {
+                conn.rollback();
+                conn.setAutoCommit(true);
+            }
+            assertThat(comptarUsuaris(conn)).isZero();
         }
 
         @Test

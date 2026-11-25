@@ -21,27 +21,57 @@ public final class UtilsSQLite {
 
     private static final Logger logger = LoggerFactory.getLogger(UtilsSQLite.class);
 
+    private static final String PREFIX_URL = "jdbc:sqlite:";
+
     // Classe d'utilitats: només té mètodes estàtics i no s'ha d'instanciar
     private UtilsSQLite() {
     }
 
     /**
+     * Operacions que s'executen dins d'una transacció.
+     *
+     * @see #executarEnTransaccio(Connection, OperacionsSQL)
+     */
+    @FunctionalInterface
+    public interface OperacionsSQL {
+        void executar(Connection conn) throws SQLException;
+    }
+
+    // =================================================================
+    // Connexió
+    // =================================================================
+
+    /**
      * Estableix una connexió amb la base de dades SQLite.
      * Si l'arxiu no existeix, SQLite en crea un de nou buit.
+     *
+     * La connexió es retorna amb la comprovació de claus foranes activada:
+     * SQLite la porta desactivada per defecte i, sense activar-la, les
+     * restriccions FOREIGN KEY de les taules no tenen cap efecte.
      *
      * @param filePath La ruta a l'arxiu de la base de dades.
      * @return L'objecte Connection (qui el rep és responsable de tancar-lo).
      * @throws SQLException Si hi ha un error en la connexió.
      */
     public static Connection connect(String filePath) throws SQLException {
-        String url = "jdbc:sqlite:" + filePath;
-        Connection conn = DriverManager.getConnection(url);
+        Connection conn = DriverManager.getConnection(PREFIX_URL + filePath);
+        try {
+            // S'ha d'executar fora de qualsevol transacció i a cada connexió nova
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("PRAGMA foreign_keys = ON");
+            }
 
-        logger.info("BBDD SQLite connectada a {}", filePath);
-        DatabaseMetaData meta = conn.getMetaData();
-        logger.info("BBDD driver: {} {}", meta.getDriverName(), meta.getDriverVersion());
-
-        return conn;
+            logger.info("BBDD SQLite connectada a {}", filePath);
+            if (logger.isDebugEnabled()) {
+                DatabaseMetaData meta = conn.getMetaData();
+                logger.debug("BBDD driver: {} {}", meta.getDriverName(), meta.getDriverVersion());
+            }
+            return conn;
+        } catch (SQLException | RuntimeException e) {
+            // Si la configuració falla, la connexió ja oberta no es pot quedar sense tancar
+            tancarPerError(conn, e);
+            throw e;
+        }
     }
 
     /**
@@ -56,10 +86,14 @@ public final class UtilsSQLite {
                 conn.close();
                 logger.info("BBDD SQLite desconnectada");
             } catch (SQLException e) {
-                logger.error("Error en tancar la connexió: {}", e.getMessage());
+                logger.error("Error en tancar la connexió.", e);
             }
         }
     }
+
+    // =================================================================
+    // Metadades
+    // =================================================================
 
     /**
      * Llista les taules d'usuari de la base de dades.
@@ -124,8 +158,9 @@ public final class UtilsSQLite {
             stmt.closeOnCompletion();
             logger.debug("Executant querySelect. SQL: {}", sql);
             return stmt.executeQuery(sql);
-        } catch (SQLException e) {
-            stmt.close();
+        } catch (SQLException | RuntimeException e) {
+            // No hi haurà cap ResultSet que tanqui el Statement: l'hem de tancar aquí
+            tancarPerError(stmt, e);
             throw e;
         }
     }
@@ -176,11 +211,80 @@ public final class UtilsSQLite {
             setParams(pstmt, params);
             logger.debug("Executant querySelectPS. SQL: {}", sql);
             return pstmt.executeQuery();
-        } catch (SQLException e) {
-            pstmt.close();
+        } catch (SQLException | RuntimeException e) {
+            // No hi haurà cap ResultSet que tanqui el PreparedStatement: l'hem de tancar aquí
+            tancarPerError(pstmt, e);
             throw e;
         }
     }
+
+    // =================================================================
+    // Transaccions
+    // =================================================================
+
+    /**
+     * Executa un grup d'operacions dins d'una sola transacció: o es confirmen
+     * totes (commit) o no se'n confirma cap (rollback).
+     *
+     * <pre>
+     * UtilsSQLite.executarEnTransaccio(conn, c -> {
+     *     UtilsSQLite.queryUpdatePS(c, "UPDATE comptes SET saldo = saldo - ? WHERE id = ?", 100, 1);
+     *     UtilsSQLite.queryUpdatePS(c, "UPDATE comptes SET saldo = saldo + ? WHERE id = ?", 100, 2);
+     * });
+     * </pre>
+     *
+     * El rollback es fa amb QUALSEVOL excepció, no només amb SQLException: tornar
+     * a activar l'autocommit amb una transacció oberta la confirmaria, i una
+     * excepció no prevista deixaria la feina desada a mitges.
+     *
+     * A MainTransaccions hi ha el mateix patró escrit pas a pas.
+     *
+     * @param conn       Connexió oberta en mode autocommit (sense cap transacció en curs).
+     * @param operacions Les operacions que formen la transacció.
+     * @throws SQLException Si alguna operació falla (després de desfer la transacció)
+     *                      o si la connexió ja té una transacció en curs.
+     */
+    public static void executarEnTransaccio(Connection conn, OperacionsSQL operacions) throws SQLException {
+        if (!conn.getAutoCommit()) {
+            throw new SQLException("La connexió ja té una transacció en curs: no se'n pot iniciar una altra.");
+        }
+        conn.setAutoCommit(false);
+        try {
+            operacions.executar(conn);
+            conn.commit();
+            logger.debug("Transacció confirmada (COMMIT).");
+        } catch (SQLException | RuntimeException e) {
+            rollback(conn, e);
+            throw e;
+        } finally {
+            conn.setAutoCommit(true);
+        }
+    }
+
+    /**
+     * Desfà la transacció en curs després d'un error.
+     *
+     * Si el rollback també falla, aquest segon error s'afegeix a l'excepció
+     * original (getSuppressed()) en lloc de substituir-la: així no es perd la
+     * causa real del problema. En aquest cas la connexió ja no és fiable i
+     * s'ha de tancar.
+     *
+     * @param conn  La connexió amb la transacció que s'ha de desfer.
+     * @param causa L'excepció que ha provocat el rollback.
+     */
+    public static void rollback(Connection conn, Exception causa) {
+        try {
+            conn.rollback();
+            logger.debug("Transacció desfeta (ROLLBACK).");
+        } catch (SQLException e) {
+            causa.addSuppressed(e);
+            logger.error("No s'ha pogut desfer la transacció.", e);
+        }
+    }
+
+    // =================================================================
+    // Mètodes interns
+    // =================================================================
 
     /**
      * Assigna els paràmetres a un PreparedStatement (els índexs JDBC comencen per 1).
@@ -196,6 +300,18 @@ public final class UtilsSQLite {
         }
         for (int i = 0; i < params.length; i++) {
             pstmt.setObject(i + 1, params[i]);
+        }
+    }
+
+    /**
+     * Tanca un recurs quan ja s'està propagant un error. Si tancar-lo també
+     * falla, l'error s'afegeix a l'original en lloc d'amagar-lo.
+     */
+    private static void tancarPerError(AutoCloseable recurs, Exception causa) {
+        try {
+            recurs.close();
+        } catch (Exception e) {
+            causa.addSuppressed(e);
         }
     }
 }

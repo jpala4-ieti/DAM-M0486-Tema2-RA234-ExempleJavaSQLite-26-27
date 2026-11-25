@@ -5,15 +5,16 @@
 #
 # Exemples:
 #       .\run.ps1
-#       .\run.ps1 cat.iesesteveterradas.Main
+#       .\run.ps1 cat.iesesteveterradas.MainTransaccions
 #       .\run.ps1 cat.iesesteveterradas.Main param1 "param amb espais"
+#
+# El codi de sortida és el de Maven: 0 si tot ha anat bé, diferent de 0 si
+# la compilació o el programa han fallat.
 
-# Ens situem a la carpeta de l'script (l'arrel del projecte)
-Set-Location $PSScriptRoot
-
-# Opcions de la JVM de Maven (exec:java executa el programa dins d'aquesta JVM).
-# Permeten l'accés per reflexió que necessiten algunes llibreries del mòdul.
-$env:MAVEN_OPTS = "--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED"
+if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) {
+    Write-Host "Error: no s'ha trobat l'ordre 'mvn'. Instal·la Maven i afegeix-lo al PATH."
+    exit 1
+}
 
 # Classe principal: primer paràmetre o, si no n'hi ha, la classe per defecte
 if ($args.Count -gt 0) {
@@ -29,7 +30,14 @@ if ($args.Count -gt 1) {
     $programArgs = $args[1..($args.Count - 1)]
 }
 
-# Cadascun entre cometes simples perquè els que contenen espais arribin sencers
+# Cadascun entre cometes simples perquè els que contenen espais arribin sencers.
+# Maven (exec.args) no té cap caràcter d'escapament: un apòstrof dins del paràmetre el trencaria.
+foreach ($arg in $programArgs) {
+    if ("$arg".Contains("'")) {
+        Write-Host "Error: els paràmetres no poden contenir apòstrofs: $arg"
+        exit 1
+    }
+}
 $execArgs = ($programArgs | ForEach-Object { "'$_'" }) -join ' '
 
 Write-Host "Classe principal: $mainClass"
@@ -41,4 +49,15 @@ if ($execArgs) {
     $mavenArgs += "-Dexec.args=$execArgs"
 }
 
-mvn @mavenArgs
+# Ens situem a la carpeta de l'script (l'arrel del projecte) només mentre s'executa Maven:
+# en acabar, el terminal torna a la carpeta on era
+$codiSortida = 1
+Push-Location $PSScriptRoot
+try {
+    mvn @mavenArgs
+    $codiSortida = $LASTEXITCODE
+} finally {
+    Pop-Location
+}
+
+exit $codiSortida

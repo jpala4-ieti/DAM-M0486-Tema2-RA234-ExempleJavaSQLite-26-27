@@ -1,13 +1,11 @@
 package cat.iesesteveterradas;
 
-import cat.iesesteveterradas.suport.DirectoriTreball;
 import cat.iesesteveterradas.suport.SortidaConsola;
 import cat.iesesteveterradas.utils.UtilsSQLite;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -35,12 +33,36 @@ class BaseDadesExempleTest {
     }
 
     @Test
-    @SuppressWarnings("try")
-    @DisplayName("obtenirRuta() apunta a data/database.db dins del directori de treball")
-    void obtenirRuta_dinsDeDataDelDirectoriDeTreball() {
-        try (DirectoriTreball dir = DirectoriTreball.canviarA(tempDir)) {
-            String ruta = BaseDadesExemple.obtenirRuta();
-            assertThat(ruta).isEqualTo(tempDir.toAbsolutePath() + File.separator + "data" + File.separator + "database.db");
+    @DisplayName("obtenirRuta() apunta a data/database.db dins del directori d'execució, amb ruta absoluta")
+    void obtenirRuta_dinsDeDataDelDirectoriDExecucio() {
+        Path ruta = Path.of(BaseDadesExemple.obtenirRuta());
+        assertThat(ruta).isAbsolute();
+        assertThat(ruta).isEqualTo(Path.of(System.getProperty("user.dir"), "data", "database.db"));
+    }
+
+    @Test
+    @DisplayName("estaInicialitzada() és fals amb un arxiu buit (connectar-s'hi no crea cap taula)")
+    void estaInicialitzada_arxiuBuit_esFals() throws SQLException {
+        try (Connection conn = UtilsSQLite.connect(tempDir.resolve("buida.db").toString())) {
+            assertThat(BaseDadesExemple.estaInicialitzada(conn)).isFalse();
+        }
+    }
+
+    @Test
+    @DisplayName("estaInicialitzada() és cert després d'inicialitzar")
+    void estaInicialitzada_despresDInicialitzar_esCert() throws SQLException {
+        try (Connection conn = UtilsSQLite.connect(tempDir.resolve("bd.db").toString())) {
+            BaseDadesExemple.inicialitzar(conn);
+            assertThat(BaseDadesExemple.estaInicialitzada(conn)).isTrue();
+        }
+    }
+
+    @Test
+    @DisplayName("inicialitzar() deixa la connexió en mode autocommit")
+    void inicialitzar_restauraAutocommit() throws SQLException {
+        try (Connection conn = UtilsSQLite.connect(tempDir.resolve("bd.db").toString())) {
+            BaseDadesExemple.inicialitzar(conn);
+            assertThat(conn.getAutoCommit()).isTrue();
         }
     }
 

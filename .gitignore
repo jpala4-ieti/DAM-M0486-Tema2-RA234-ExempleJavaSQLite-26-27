@@ -2,8 +2,11 @@
 target/
 dependency-reduced-pom.xml
 
-# Arxius generats en executar (bases de dades, logs)
+# Arxius generats en executar (bases de dades, arxius temporals d'SQLite, logs)
 data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
 logs/
 
 # IDE

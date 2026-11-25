@@ -1,6 +1,5 @@
 package cat.iesesteveterradas;
 
-import cat.iesesteveterradas.suport.DirectoriTreball;
 import cat.iesesteveterradas.suport.LogCapturat;
 import cat.iesesteveterradas.suport.SortidaConsola;
 import cat.iesesteveterradas.utils.UtilsSQLite;
@@ -106,14 +105,15 @@ class MainTransaccionsTest {
 
     @Test
     @Tag("integracio")
-    @SuppressWarnings("try")
-    @DisplayName("main(): mostra l'estat inicial, el mateix estat després del rollback i l'estat final")
-    void main_mostraTotsElsPassos() throws SQLException {
-        try (DirectoriTreball dir = DirectoriTreball.canviarA(tempDir);
-             LogCapturat log = LogCapturat.de(MainTransaccions.class);
+    @DisplayName("executar(): mostra l'estat inicial, el mateix estat després del rollback i l'estat final")
+    void executar_mostraTotsElsPassos() throws SQLException {
+        // La carpeta 'data' encara no existeix: l'ha de crear el programa
+        String ruta = tempDir.resolve("data").resolve("database.db").toString();
+
+        try (LogCapturat log = LogCapturat.de(MainTransaccions.class);
              SortidaConsola sortida = SortidaConsola.capturar()) {
 
-            MainTransaccions.main(new String[0]);
+            MainTransaccions.executar(ruta);
 
             assertThat(log.missatges(Level.ERROR)).isEmpty();
             assertThat(sortida.seccio("Contingut de la taula abans de cap transacció:")).containsExactly(INICIALS);
@@ -122,8 +122,8 @@ class MainTransaccionsTest {
                     .containsExactly("1, Amazon Spain", "2, El Corte Inglés Spain", "4, Decathlon");
         }
 
-        // L'arxiu queda a <directori de treball>/data/database.db amb l'estat final
-        try (Connection bd = UtilsSQLite.connect(tempDir.resolve("data").resolve("database.db").toString())) {
+        // L'arxiu queda amb l'estat final
+        try (Connection bd = UtilsSQLite.connect(ruta)) {
             assertThat(files(bd)).containsExactly("1, Amazon Spain", "2, El Corte Inglés Spain", "4, Decathlon");
         }
     }
